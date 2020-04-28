@@ -29,7 +29,7 @@ def seq2int(seq):
     TODO:
         make this base 4 (or 5...)
     '''
-    d = {"A":"1", "C":"2", "G":"3", "T":"4" }
+    d = {"A":"1", "C":"2", "G":"3", "T":"4", "N":"5"}
     decstring = ""
     for i in range(len(seq)):
         decstring += d[seq[i]]
@@ -43,7 +43,7 @@ def int2seq(n):
     Returns:
         seq (string): DNA sequence as string
     '''
-    d = {"1":"A", "2":"C", "3":"G", "4":"T"}
+    d = {"1":"A", "2":"C", "3":"G", "4":"T", "5":"N"}
     decstring = str(n)
     seq = ""
     for i in range(0, len(decstring)):
@@ -75,7 +75,17 @@ def add_to_graph_from_recs(G, rec_df, num_bcs, as_int=False):
         for i in range(num_bcs - 1):
             G.add_edge(row[bclist[i]], row[bclist[i+1]])
 
+def find_connected_comps(G):
+    '''
+    Args:
+        G (networkx graph object): supergraph to find components of
 
+    Returns:
+        Ss (list of graph objs): list of connected components of G, sorted by
+                                 size in increasing order
+    '''
+
+    return [G.subgraph(c).copy() for c in sorted(nx.connected_components(G), key=len)]
 
 def save_graph(G, filename, fileformat='adjlist'):
     '''
@@ -93,7 +103,7 @@ def save_graph(G, filename, fileformat='adjlist'):
     else:
         nx.write_gpickle(G, filename)
 
-reclist = input("enter rec list filename: ")
+reclist = input("Enter rec list filename: ")
 
 bc4recs = rec_list2df(reclist)
 
@@ -101,4 +111,11 @@ graph4 = nx.Graph()
 
 add_to_graph_from_recs(graph4, bc4recs, 4, as_int=True)
 
-save_graph(graph4, 'g4.pickle', fileformat='pickle')
+save_graph(graph4, 'totalg4.pickle', fileformat='pickle')
+
+print("Total graph constructed")
+
+Ss = find_connected_comps(graph4)
+
+for i in range(len(Ss)):
+    save_graph(Ss[i], "component%d.pickle" % i, fileformat='pickle')
