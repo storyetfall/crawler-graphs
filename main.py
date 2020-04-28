@@ -103,19 +103,31 @@ def save_graph(G, filename, fileformat='adjlist'):
     else:
         nx.write_gpickle(G, filename)
 
-reclist = input("Enter rec list filename: ")
+reclist4 = input("Enter rec list 4 file path: ")
 
-bc4recs = rec_list2df(reclist)
+reclist3 = input("Enter rec list 3 file path: ")
 
-graph4 = nx.Graph()
+bc4recs = rec_list2df(reclist4)
 
-add_to_graph_from_recs(graph4, bc4recs, 4, as_int=True)
+graph = nx.Graph()
 
-save_graph(graph4, 'totalg4.pickle', fileformat='pickle')
+add_to_graph_from_recs(graph, bc4recs, 4, as_int=False)
 
-print("Total graph constructed")
+save_graph(graph, 'graph4.pickle', fileformat='pickle')
 
-Ss = find_connected_comps(graph4)
+print("Graph constructed from 4 barcode set")
+
+bc3recs = rec_list2df(reclist3)
+
+add_to_graph_from_recs(graph, bc3recs)
+
+save_graph(graph, 'graph4and3.pickle', fileformat='pickle')
+
+print("Graph constructed from 3 barcode set")
+
+Ss = find_connected_comps(graph)
+
+print("Connected components have been identified")
 
 for i in range(len(Ss)):
     save_graph(Ss[i], "component%d.pickle" % i, fileformat='pickle')
